@@ -18,6 +18,7 @@ namespace Presistence
         public UnitOfWork(StoreDbContext context)
         {
             _context = context;
+            _repositories = new();
 
         }
 
