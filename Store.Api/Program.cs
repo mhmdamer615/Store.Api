@@ -3,6 +3,10 @@ using Domain.Contract;
 using Microsoft.EntityFrameworkCore;
 using Presistence;
 using Presistence.Data;
+using Services.Abstraction;
+using Services;
+using System.Reflection.Metadata;
+using Services.Mapping_Profiles;
 
 namespace Store.Api
 {
@@ -23,6 +27,9 @@ namespace Store.Api
             });
             builder.Services.AddScoped<IDbInitializer, DbInitializer>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IServiceManager, ServiceManager>();
+            builder.Services.AddAutoMapper(typeof(Services.ServiceManager).Assembly);
+            builder.Services.AddAutoMapper(x => x.AddProfile(new ProductProfile()));
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -40,6 +47,8 @@ namespace Store.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseStaticFiles();
 
             app.UseHttpsRedirection();
 

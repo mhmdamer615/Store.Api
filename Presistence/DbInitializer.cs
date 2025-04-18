@@ -27,42 +27,37 @@ namespace Presistence
             //    _context.Database.Migrate();
             //}
 
+
             if (!_context.ProductTypes.Any())
             {
-                var typeData = File.ReadAllText(@"..\Persistence\Data\Seeding\types.json");
-
+                var typeData = File.ReadAllText(@"..\Presistence\Data\Seeding\types.json");
                 var types = JsonSerializer.Deserialize<List<ProductType>>(typeData);
 
                 if (types is not null && types.Any())
                 {
-                   await _context.ProductTypes.AddRangeAsync(types);
-                   await  _context.SaveChangesAsync();
+                    _context.ProductTypes.AddRange(types);
+                    _context.SaveChanges();
                 }
             }
 
             if (!_context.ProductBrands.Any())
             {
-                var brandsData = File.ReadAllText(@"..\Persistence\Data\Seeding\brands .json");
-
-                var brands = JsonSerializer.Deserialize<List<ProductBrand>>(brandsData);
-
+                var brandData = File.ReadAllText(@"..\Presistence\Data\Seeding\brands.json");
+                var brands = JsonSerializer.Deserialize<List<ProductBrand>>(brandData);
                 if (brands is not null && brands.Any())
                 {
-                   await _context.ProductBrands.AddRangeAsync(brands);
-                   await _context.SaveChangesAsync();
+                    _context.ProductBrands.AddRange(brands);
+                    _context.SaveChanges();
                 }
             }
-
             if (!_context.Products.Any())
             {
-                var ProductsData = File.ReadAllText(@"..\Persistence\Data\Seeding\products.json");
-
-                var products = JsonSerializer.Deserialize<List<Product>>(ProductsData);
-
+                var productData = File.ReadAllText(@"..\Presistence\Data\Seeding\products.json");
+                var products = JsonSerializer.Deserialize<List<Product>>(productData);
                 if (products is not null && products.Any())
                 {
-                   await _context.Products.AddRangeAsync(products);
-                   await  _context.SaveChangesAsync();
+                    _context.Products.AddRange(products);
+                    _context.SaveChanges();
                 }
             }
         }

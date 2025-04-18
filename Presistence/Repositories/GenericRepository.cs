@@ -30,8 +30,18 @@ namespace Presistence.Repositories
             return await _context.Set<TEntity>().AsNoTracking().ToListAsync();
         }
 
+        public async Task<IEnumerable<TEntity>> GetAllAsync(Specification<TEntity> specifications)
+        {
+            return await SpecificationEvaluater.GetQuery(_context.Set<TEntity>(), specifications).ToListAsync();
+        }
+
         public async Task<TEntity?> GetAsync(TKey Id)
         => await _context.Set<TEntity>().FindAsync(Id);
+
+        public async Task<TEntity?> GetAsync(Specification<TEntity> specification)
+        {
+            return await SpecificationEvaluater.GetQuery(_context.Set<TEntity>(), specification).FirstOrDefaultAsync();
+        }
 
         public void UpDate(TEntity entity)
         => _context.Set<TEntity>().Update(entity);
