@@ -1,6 +1,7 @@
 ﻿using Domain.Contract;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Presistence.Data;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,11 @@ namespace Presistence.Repositories
         }
         public async Task AddAsync(TEntity entity)
        => await _context.Set<TEntity>().AddAsync(entity);
+
+        public async Task<int> CountAsync(Specification<TEntity> specification)
+        {
+            return await SpecificationEvaluater.GetQuery(_context.Set<TEntity>(), specification).CountAsync();
+        }
 
         public void Delete(TEntity entity)
         => _context.Set<TEntity>().Remove(entity);
