@@ -7,6 +7,11 @@ using Services.Abstraction;
 using Services;
 using System.Reflection.Metadata;
 using Services.Mapping_Profiles;
+using Store.Api.Middlewares;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Store.Api.Factories;
+using StackExchange.Redis;
 
 namespace Store.Api
 {
@@ -27,12 +32,21 @@ namespace Store.Api
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
             });
+
+            builder.Services.AddSingleton<IConnectionMultiplexer>(
+                _ => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis"))
+                );
+
             builder.Services.AddScoped<IDbInitializer, DbInitializer>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IBasketRepository,IBasketRepository>();
             builder.Services.AddScoped<IServiceManager, ServiceManager>();
             builder.Services.AddAutoMapper(typeof(Services.ServiceManager).Assembly);
             builder.Services.AddAutoMapper(x => x.AddProfile(new ProductProfile()));
-
+            builder.Services.Configure<ApiBehaviorOptions>(Options =>
+            {
+                Options.InvalidModelStateResponseFactory = ApiResponseFactory.CustomValidationErrorResponse;
+            });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -41,6 +55,8 @@ namespace Store.Api
             var app = builder.Build();
 
             await seedDbAsync(app);
+
+            app.UseMiddleware<GlobalErrorHandlingMiddleware>(); 
 
 
             // Configure the HTTP request pipeline.
@@ -51,6 +67,8 @@ namespace Store.Api
             }
 
             app.UseStaticFiles();
+
+            
 
             app.UseHttpsRedirection();
 
