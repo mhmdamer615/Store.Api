@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-    public class ValidationExeption : Exception
+    public class ValidationException : Exception
     {
         public IEnumerable<string> Errors { get; set; }
-        public ValidationExeption(IEnumerable<string> errors) : base("Validation Failed")
+        public ValidationException(IEnumerable<string> errors) : base("Validation Failed")
         {
             Errors = errors;
         }
