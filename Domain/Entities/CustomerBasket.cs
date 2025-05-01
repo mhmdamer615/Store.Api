@@ -9,6 +9,6 @@ namespace Domain.Entities
     public class CustomerBasket
     {
         public int Id { get; set; }
-        public IEnumerable<BasketItem> BasketItems { get; set; }
+        public IEnumerable<BasketItem> Items  { get; set; }
     }
 }

@@ -12,6 +12,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Store.Api.Factories;
 using StackExchange.Redis;
+using Presistence.Identity;
+using Microsoft.AspNetCore.Identity;
+using Domain.Entities.Identity;
+using Presistence.Repositories;
+using Shared.IdentityDtos;
+using Store.Api.Extensions;
 
 namespace Store.Api
 {
@@ -23,30 +29,18 @@ namespace Store.Api
 
             // Add services to the container.
 
-            builder.Services.AddControllers().AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-            });
 
-            builder.Services.AddDbContext<StoreDbContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
-            });
 
-            builder.Services.AddSingleton<IConnectionMultiplexer>(
-                _ => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis"))
-                );
 
-            builder.Services.AddScoped<IDbInitializer, DbInitializer>();
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddScoped<IBasketRepository,IBasketRepository>();
-            builder.Services.AddScoped<IServiceManager, ServiceManager>();
-            builder.Services.AddAutoMapper(typeof(Services.ServiceManager).Assembly);
+            builder.Services.AddInfrastructureServices(builder.Configuration);
+            builder.Services.AddCoreServices(builder.Configuration);
+            builder.Services.AddPresentationServices();
+
+
+
             builder.Services.AddAutoMapper(x => x.AddProfile(new ProductProfile()));
-            builder.Services.Configure<ApiBehaviorOptions>(Options =>
-            {
-                Options.InvalidModelStateResponseFactory = ApiResponseFactory.CustomValidationErrorResponse;
-            });
+
+
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -54,9 +48,9 @@ namespace Store.Api
 
             var app = builder.Build();
 
-            await seedDbAsync(app);
+            await app.seedDbAsync();
 
-            app.UseMiddleware<GlobalErrorHandlingMiddleware>(); 
+            app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 
 
             // Configure the HTTP request pipeline.
@@ -68,25 +62,16 @@ namespace Store.Api
 
             app.UseStaticFiles();
 
-            
+
 
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
             app.MapControllers();
 
             app.Run();
-        }
-
-        static async Task seedDbAsync(WebApplication app)
-        {
-            using var scope = app.Services.CreateScope();
-
-            var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-
-            await dbInitializer?.InitializeAsync();
         }
 
     }

@@ -63,7 +63,7 @@ namespace Store.Api.Middlewares
             httpContext.Response.StatusCode = ex switch
             {
                 NotFoundException => (int)HttpStatusCode.NotFound,
-                ValidationExeption validationExeption => HandleValidationException(validationExeption, response),
+                ValidationException validationExeption => HandleValidationException(validationExeption, response),
                 _ => (int)HttpStatusCode.InternalServerError
             };
 
@@ -72,7 +72,7 @@ namespace Store.Api.Middlewares
             await httpContext.Response.WriteAsync(response.ToString());
         }
 
-        private int HandleValidationException(ValidationExeption ex , ErrorDetails errorDetails)
+        private int HandleValidationException(ValidationException ex , ErrorDetails errorDetails)
         {
             errorDetails.Errors = ex.Errors;
             return (int)HttpStatusCode.BadRequest;
