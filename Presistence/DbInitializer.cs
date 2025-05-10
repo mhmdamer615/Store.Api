@@ -75,7 +75,7 @@ namespace Presistence
 
             if (!_context.DeliveryMethods.Any())
             {
-                var deliveryData = File.ReadAllText(@"..\Persistence\Data\Seeding\delivery.json");
+                 var deliveryData = File.ReadAllText(@"..\Persistence\Data\Seeding\delivery.json");
                 var deliveryMethods = JsonSerializer.Deserialize<List<DeliveryMethod>>(deliveryData);
                 if (deliveryMethods is not null && deliveryMethods.Any())
                 {
